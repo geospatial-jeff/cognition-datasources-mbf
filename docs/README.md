@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/geospatial-jeff/cognition-datasources-mbf.svg?style=svg)](https://circleci.com/gh/geospatial-jeff/cognition-datasources-mbf)
+
 ## Microsoft Building Footprints
 
 | Parameter | Status |
