@@ -1,23 +1,35 @@
-[![CircleCI](https://circleci.com/gh/geospatial-jeff/cognition-datasources-mbf.svg?style=svg)](https://circleci.com/gh/geospatial-jeff/cognition-datasources-mbf)
+# External Drivers
 
-## Microsoft Building Footprints
+1. Add driver requirements to `requirements.txt` and `requirements-dev.txt`
+2. Build docker image
 
-| Parameter | Status |
-| ----------| ------ |
-| Spatial | :heavy_check_mark: |
-| Temporal | :x: |
-| Properties | :heavy_check_mark: |
-| **kwargs | [limit] |
+```
+docker build . -t <driver-name>:latest
+```
 
-##### Properties
-| Property | Type | Example |
-|--------------------------|-------|-------------|
-| eo:epsg | int | 3857 |
-| legacy:x | str | 'W102' |
-| legacy:area | float | 100.0 |
-| legacy:length | float | 30.0 |
-| legacy:state | str | 'CA' |
+3. Run test cases inside docker container
 
+```
+docker run --rm -v $PWD:/home/cognition-datasources -it <driver-name>:latest python -m unittest tests.py
+```
 
-##### Notes
-- The source API doesn't support temporal data.  Can search with temporal but it is not honored.
+4. Build lambda layer
+
+```
+docker run --rm -v $PWD:/home/cognition-datasources -it <driver-name<:latest driver-package.sh <driver-name>
+```
+
+5. Deploy layer to lambda
+```
+aws lambda publish-layer-version \
+    --layer-name <driver-name> \
+    --zip-file fileb://lambda-deploy.zip
+```
+
+6. Make layer public (do this after deploying a new version)
+```
+aws lambda add-layer-version-permission --layer-name <driver-name> \
+    --statement-id public --version-number 1 --principal '*' \
+    --action lambda:GetLayerVersion
+```
+
